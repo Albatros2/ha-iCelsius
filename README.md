@@ -1,5 +1,7 @@
 # iCelsius for Home Assistant
 
+[![Open your Home Assistant instance and show the integration inside HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Albatros2&repository=ha-iCelsius&category=integration)
+
 This custom integration receives iCelsius sensor packets over UDP and exposes
 temperature, battery voltage, and signal strength in Home Assistant. It also
 provides entities to change the sampling interval and Wi-Fi SSID.
