@@ -11,7 +11,7 @@ provides entities to change the sampling interval and Wi-Fi SSID.
 1. Copy `custom_components/icelsius` into the Home Assistant `custom_components`
    directory, or add this repository to HACS as a custom integration.
 2. Restart Home Assistant and add **iCelsius** from **Settings > Devices & services**.
-3. Enter the UDP port that the sensor sends its data to (default `54520`).
+3. Enter the UDP port that the sensor sends its data to (default `54521`).
 4. Configure the sensor to send its UDP telemetry to the Home Assistant host and
    that port. Allow inbound UDP traffic through the host firewall.
 

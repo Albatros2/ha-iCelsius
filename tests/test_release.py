@@ -16,6 +16,11 @@ class ReleaseVersionTests(unittest.TestCase):
         tags = ["v2026.10.4", "v2026.10.4.1", "v2026.10.4.3"]
         self.assertEqual(next_version(date(2026, 10, 4), tags), "2026.10.4.4")
 
+    def test_release_advances_an_already_installed_daily_version(self):
+        self.assertEqual(
+            next_version(date(2026, 10, 4), [], "2026.10.4"), "2026.10.4.1"
+        )
+
     def test_tags_from_other_days_do_not_change_version(self):
         self.assertEqual(
             next_version(date(2026, 10, 4), ["v2026.10.3", "v2026.9.30.1"]),

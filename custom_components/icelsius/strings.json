@@ -7,10 +7,17 @@
         "data": {
           "port": "UDP listen port"
         }
+      },
+      "reconfigure": {
+        "title": "Change iCelsius UDP port",
+        "data": {
+          "port": "UDP listen port"
+        }
       }
     },
     "abort": {
-      "already_configured": "This UDP port is already configured."
+      "already_configured": "This UDP port is already configured.",
+      "reconfigure_successful": "The UDP port was updated."
     }
   }
 }
