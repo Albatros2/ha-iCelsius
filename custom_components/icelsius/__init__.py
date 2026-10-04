@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import re
 import socket
 from collections.abc import Callable
 
@@ -12,32 +11,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import DOMAIN, SENSOR_COMMAND_PORT
+from .protocol import PacketBuffer, normalize_value
 
 _LOGGER = logging.getLogger(__name__)
-_NUMBER_PATTERN = re.compile(r"^-?\d+(?:\.\d+)?$")
-
-
-def parse_payload(payload: bytes) -> dict[str, str]:
-    """Parse the ampersand-delimited key/value payload sent by the sensor."""
-    text = payload.decode("ascii", errors="replace")
-    fields = {}
-    for part in text.split("&"):
-        if "=" in part:
-            key, value = part.split("=", 1)
-            if key:
-                fields[key] = value
-    return fields
-
-
-def normalize_value(key: str, value: str):
-    if key.startswith("temp") and _NUMBER_PATTERN.match(value):
-        return (float(value) - 25000) / 100
-    if key == "battery" and _NUMBER_PATTERN.match(value):
-        return float(value) / 1000
-    if _NUMBER_PATTERN.match(value):
-        numeric_value = float(value)
-        return int(numeric_value) if numeric_value.is_integer() else numeric_value
-    return value
 
 
 class ICelsiusProtocol(asyncio.DatagramProtocol):
@@ -45,15 +21,28 @@ class ICelsiusProtocol(asyncio.DatagramProtocol):
         self.runtime = runtime
 
     def datagram_received(self, data: bytes, addr: tuple[str, int]) -> None:
-        fields = parse_payload(data)
-        sensor_id = fields.get("SensorID")
+        _LOGGER.debug(
+            "Received %s bytes from iCelsius sender %s:%s",
+            len(data),
+            addr[0],
+            addr[1],
+        )
+        peer = self.runtime.peers.setdefault(addr, PacketBuffer())
+        updates = peer.feed(data)
+        sensor_id = peer.values.get("SensorID")
         if not sensor_id:
-            _LOGGER.debug("Ignoring iCelsius packet without SensorID from %s", addr[0])
+            _LOGGER.debug(
+                "Waiting for a complete iCelsius SensorID from %s:%s",
+                addr[0],
+                addr[1],
+            )
             return
 
+        if sensor_id not in self.runtime.devices:
+            _LOGGER.debug("Discovered iCelsius sensor %s from %s", sensor_id, addr[0])
         device = self.runtime.devices.setdefault(sensor_id, {})
         device["ip"] = addr[0]
-        for key, value in fields.items():
+        for key, value in peer.values.items():
             device[key] = normalize_value(key, value)
         for listener in tuple(self.runtime.listeners):
             listener(sensor_id)
@@ -63,6 +52,7 @@ class ICelsiusRuntime:
     def __init__(self, port: int) -> None:
         self.port = port
         self.devices: dict[str, dict] = {}
+        self.peers: dict[tuple[str, int], PacketBuffer] = {}
         self.listeners: set[Callable[[str], None]] = set()
         self.transport: asyncio.DatagramTransport | None = None
 

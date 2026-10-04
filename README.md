@@ -15,7 +15,24 @@ provides entities to change the sampling interval and Wi-Fi SSID.
 4. Configure the sensor to send its UDP telemetry to the Home Assistant host and
    that port. Allow inbound UDP traffic through the host firewall.
 
+The thermometer must be configured to send telemetry to Home Assistant's IP and
+the selected UDP port; being connected to the same network alone is not enough
+for discovery. If no device appears, enable debug logging for
+`custom_components.icelsius` and check that packets reach this port.
+
 The integration discovers each sensor from its `SensorID` field. Temperature
 fields use the FHEM conversion `(raw - 25000) / 100`; battery values are exposed
 as volts (`raw / 1000`). The sampling interval command is sent to the sensor's
 source IP on UDP port `54521`.
+
+## Versioning Strategy
+
+Integration versions and Git tags use calendar versioning:
+
+- First release of a day: `YYYY.M.D` (for example, `2026.10.4`)
+- Additional releases on the same day: `YYYY.M.D.N` (for example, `2026.10.4.1`)
+- Git tags add a `v` prefix, such as `v2026.10.4` or `v2026.10.4.1`
+
+To publish a release, run **Actions > Release > Run workflow** on the `main`
+branch. The workflow updates the integration version, pushes the release commit
+and tag, and creates a GitHub release with generated notes.
