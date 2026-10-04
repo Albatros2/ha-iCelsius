@@ -33,6 +33,7 @@ Integration versions and Git tags use calendar versioning:
 - Additional releases on the same day: `YYYY.M.D.N` (for example, `2026.10.4.1`)
 - Git tags add a `v` prefix, such as `v2026.10.4` or `v2026.10.4.1`
 
-To publish a release, run **Actions > Release > Run workflow** on the `main`
-branch. The workflow updates the integration version, pushes the release commit
-and tag, and creates a GitHub release with generated notes.
+Changes to the integration on `main` trigger a release automatically. You can
+also start one with **Actions > Release > Run workflow**. The workflow updates
+the integration version, pushes the release commit and tag, and creates a
+GitHub release with generated notes.

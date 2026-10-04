@@ -1,10 +1,21 @@
 name: Release
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/release.yml"
+      - "custom_components/icelsius/**"
+      - "scripts/release.py"
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: icelsius-release
+  cancel-in-progress: false
 
 jobs:
   release:
