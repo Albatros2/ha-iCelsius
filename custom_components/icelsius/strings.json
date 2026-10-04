@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to iCelsius",
+        "description": "Listen for iCelsius sensor packets on the configured UDP port.",
+        "data": {
+          "port": "UDP listen port"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This UDP port is already configured."
+    }
+  }
+}
